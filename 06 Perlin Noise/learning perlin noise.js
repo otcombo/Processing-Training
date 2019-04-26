@@ -5,14 +5,12 @@ var terrian = [];
 
 var yoff = 0;
 var inc = 0.1;
-var zscale = 150;
+var zscale = 100;
 
 var flying = 0;
 
 function setup() {
 	createCanvas(windowWidth, windowHeight, WEBGL);
-
-	var fps = frameRate();
 	
 	rows = int(width / size);
 	cols = int(height / size);
@@ -21,20 +19,17 @@ function setup() {
 
 function draw() {
 	background(0);
-	// fill(255, 100);
-	noFill();
 
 	rotateX(PI/2.2);
 	translate(-width/2, 0);
-
-	// text("FPS: " + fps, 10, 10);
 	
+	noFill();
 	flying -= 0.01;
 	yoff = flying;
 
 	for (var y = 0; y < cols; y++) {
 		terrian[y] = [];
-		var xoff = 0;
+		var xoff = flying/2;
 		for (var x = 0; x < rows; x++) {
 			terrian[y][x] = map (noise(xoff,yoff), 0, 1, zscale*-1, zscale);
 			xoff += inc;
@@ -44,8 +39,7 @@ function draw() {
 
 	for (var y = 0; y < cols - 1; y++) {
 
-
-		stroke(255,map(y,0,20,0,50));
+		stroke(255,map(y,0,20,0,20));
 
 		beginShape(TRIANGLE_STRIP);
 		for (var x = 0; x < rows - 1; x++) {
