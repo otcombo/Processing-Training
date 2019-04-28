@@ -11,27 +11,31 @@ var flying = 0;
 
 function setup() {
 	createCanvas(windowWidth, windowHeight, WEBGL);
-	
+
 	rows = int(width / size);
-	cols = int(height / size);
+	cols = int(height / size / 2);
+
+	noiseDetail(2);
 
 }
 
 function draw() {
 	background(0);
 
-	rotateX(PI/2.2);
+	rotateX(PI/2.1);
 	translate(-width/2, 0);
-	
+
 	noFill();
-	flying -= 0.01;
+	flying -= 0.02;
 	yoff = flying;
 
 	for (var y = 0; y < cols; y++) {
+
 		terrian[y] = [];
-		var xoff = flying/2;
+		var xoff = flying / 2;
+
 		for (var x = 0; x < rows; x++) {
-			terrian[y][x] = map (noise(xoff,yoff), 0, 1, zscale*-1, zscale);
+			terrian[y][x] = map (noise(xoff,yoff), 0, 1, 0, zscale);
 			xoff += inc;
 		}
 		yoff += inc;
@@ -39,7 +43,9 @@ function draw() {
 
 	for (var y = 0; y < cols - 1; y++) {
 
-		stroke(255,map(y,0,20,0,20));
+		fill(255, map(y, 0, cols, 20, 0));
+		stroke(255, map(y, 0, cols, 20, 0));
+		// strokeWeight(4);
 
 		beginShape(TRIANGLE_STRIP);
 		for (var x = 0; x < rows - 1; x++) {
@@ -113,7 +119,7 @@ function draw() {
 // 			pixels[index+3] = 255;
 
 // 			xoff += inc;
-// 		}	
+// 		}
 
 // 		yoff += inc;
 // 	}
