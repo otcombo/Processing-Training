@@ -40,11 +40,11 @@ function spinRays(center_x,center_y) {
 			line(0, 0, width*1.5, 0)
 			angle = 0;
 			step = 3;
-			// for (var i = 0; i < 360; i++) {
-			// 	rotate(step)
-			// 	line(0, 0, 1000, 20)
-			// 	angle += step;
-			// }
+			for (var i = 0; i < 360; i++) {
+				rotate(step)
+				line(0, 0, 1000, 20)
+				angle += step;
+			}
 		pop();
 		//
 		// img_1 = get(0, 0, width, height);
