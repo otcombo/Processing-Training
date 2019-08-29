@@ -1,130 +1,214 @@
-var color_bg, color_rect, color_storke;
-var rotation, angle, step;
+var dotArray = [];
+effectRad = 0;
+
+// ============================================================ //
+
+Dot = (function() {
+  class Dot {
+    constructor() {
+      this.pos = createVector(0, 0);
+      this.size = 10;
+      this.color = color(255);
+      this.targetPos = createVector(0, 0);
+      this.currentMoveFrameCount = 0;
+      this.isMoving = false;
+      this.relayRatio = 0;
+      this.relayPos = createVector(0, 0);
+      this.startRatio = 0;
+      this.startPos = createVector(0, 0);
+      this.endRatio = 0;
+      this.endPos = createVector(0, 0);
+    }
+
+    setTarget(x, y) {
+      var displaceX, displaceY;
+      if (this.isMoving) {
+        this.pos.set(this.endPos.x, this.endPos.y);
+      }
+      this.targetPos.set(x, y);
+      this.currentMoveFrameCount = 0;
+      this.isMoving = true;
+      displaceX = x - this.pos.x;
+      displaceY = y - this.pos.y;
+      if (Math.random() < 0.5) {
+        this.relayRatio = abs(displaceX) / (abs(displaceX) + abs(displaceY));
+        this.relayPos.set(this.pos.x + displaceX, this.pos.y);
+      } else {
+        this.relayRatio = abs(displaceY) / (abs(displaceX) + abs(displaceY));
+        this.relayPos.set(this.pos.x, this.pos.y + displaceY);
+      }
+    }
+
+    update() {
+      var endX, endY, ratio, startX, startY;
+      if (this.isMoving) {
+        this.currentMoveFrameCount++;
+        this.startRatio = this.getstartRatio();
+        this.endRatio = this.getendRatio();
+        if (this.startRatio < this.relayRatio) {
+          ratio = this.startRatio / this.relayRatio;
+          startX = this.pos.x + ratio * (this.relayPos.x - this.pos.x);
+          startY = this.pos.y + ratio * (this.relayPos.y - this.pos.y);
+        } else {
+          ratio = (this.startRatio - this.relayRatio) / (1 - this.relayRatio);
+          startX = this.relayPos.x + ratio * (this.targetPos.x - this.relayPos.x);
+          startY = this.relayPos.y + ratio * (this.targetPos.y - this.relayPos.y);
+        }
+        this.startPos.set(startX, startY);
+        if (this.endRatio < this.relayRatio) {
+          ratio = this.endRatio / this.relayRatio;
+          endX = this.pos.x + ratio * (this.relayPos.x - this.pos.x);
+          endY = this.pos.y + ratio * (this.relayPos.y - this.pos.y);
+        } else {
+          ratio = (this.endRatio - this.relayRatio) / (1 - this.relayRatio);
+          endX = this.relayPos.x + ratio * (this.targetPos.x - this.relayPos.x);
+          endY = this.relayPos.y + ratio * (this.targetPos.y - this.relayPos.y);
+        }
+        this.endPos.set(endX, endY);
+        if (this.currentMoveFrameCount >= this.moveDurationFrameCount) {
+          this.pos.set(this.targetPos.x, this.targetPos.y);
+          this.isMoving = false;
+        }
+      }
+    }
+
+    display() {
+      if (this.isMoving) {
+        strokeWeight(this.size);
+        stroke(this.color);
+        noFill();
+        beginShape();
+        vertex(this.startPos.x, this.startPos.y);
+        if (this.startRatio < this.relayRatio && this.relayRatio < this.endRatio) {
+          vertex(this.relayPos.x, this.relayPos.y);
+        }
+        vertex(this.endPos.x, this.endPos.y);
+        endShape();
+      } else {
+        noStroke();
+        fill(this.color);
+        ellipse(this.pos.x, this.pos.y, this.size, this.size);
+      }
+    }
+
+    getMoveProgressRatio() {
+      return min(1, this.currentMoveFrameCount / this.moveDurationFrameCount);
+    }
+
+    getstartRatio() {
+      return -(Math.pow(this.getMoveProgressRatio() - 1, 2)) + 1;
+    }
+
+    getendRatio() {
+      return -(Math.pow(this.getMoveProgressRatio() - 1, 4)) + 1;
+    }
+
+    getDistance(x, y) {
+      return dist(x, y, this.pos.x, this.pos.y);
+    }
+
+  }
+
+  Dot.prototype.moveDurationFrameCount = 17;
+
+  return Dot;
+
+})();
+
+function createDot() {
+  var newDot;
+  newDot = new Dot();
+  newDot.pos = createVector(random(width), random(height));
+  newDot.size = width / 500;
+  newDot.color = createColor(50, 100);
+  return newDot;
+};
+
+function createColor(saturation, brightness) {
+  var newColor;
+  colorMode(HSB);
+  newColor = color(random(360), saturation, brightness);
+  colorMode(RGB);
+  return newColor;
+};
+
+
+// ============================================================ //
+
+processDots = function(func, effectRad, probability) {
+  var eachDot, i, len;
+  for (i = 0, len = dotArray.length; i < len; i++) {
+    eachDot = dotArray[i];
+    if (eachDot.isMoving) {
+      continue;
+    }
+    if (!(Math.random() < probability)) {
+      continue;
+    }
+    func(eachDot, effectRad);
+  }
+};
+
+awayFromMouse = function(dot, effectRad) {
+  if (!(dot.getDistance(mouseX, mouseY) < effectRad)) {
+    return;
+  }
+  dot.setTarget(random(width), random(height));
+};
+
+attractToMouse = function(dot, effectRad) {
+  var angle, distance, x, y;
+  distance = Math.random() * effectRad;
+  angle = Math.random() * TWO_PI;
+  x = mouseX + distance * cos(angle);
+  if (x < 0) {
+    x = -x;
+  } else if (x > width) {
+    x = width - (x - width);
+  }
+  y = mouseY + distance * sin(angle);
+  if (y < 0) {
+    y = -y;
+  } else if (y > height) {
+    y = height - (y - height);
+  }
+  dot.setTarget(x, y);
+};
+
+
+// ============================================================ //
 
 function setup() {
-	var canvas = createCanvas(500, 500);
-	canvas.parent('sketch-holder');
-
-	//Define color
-	color_bg = color(240, 64, 0);
-	color_rect = color(255, 70, 0);
-	color_line = color(255, 240, 230, 250);
-
-	rotation = 0;
-}
+  // min(windowWidth, displayWidth)
+  createCanvas(windowWidth, windowHeight);
+  for (var i = 0; i < 150; i++) {
+    dotArray.push(createDot());
+  }
+  effectRad = 0.25 * width;
+};
 
 function draw() {
-	//Draw Background
-	background(color_bg);
-	fill(color_rect);
-	noStroke();
-	rect(0, 0, width, height);
+  var eachDot, len;
+  blendMode(BLEND);
+  background(0, 0, 0);
+  blendMode(ADD);
+  for (var i = 0, len = dotArray.length; i < len; i++) {
+    eachDot = dotArray[i];
+    eachDot.update();
+    eachDot.display();
+  }
+  if (mouseIsPressed) {
+    processDots(attractToMouse, effectRad, 0.1);
+  } else {
+    processDots(awayFromMouse, effectRad, 1);
+    processDots(attractToMouse, effectRad, 0.001);
+  }
+};
 
-	//Draw Spin lines
-	stroke(color_line);
-	strokeWeight(1);
+function keyPressed() {
+  if (key === 'P') noLoop();
+};
 
-	spinRays(mouseX, mouseY);
-	// noLoop();
-}
-
-function spinRays(center_x,center_y) {
-		push()
-			translate(center_x, center_y);
-			// scale(-1, 1);
-
-			rotate(rotation);
-			rotation -= 0.5;
-			rotation = rotation % 360;
-
-			line(0, 0, width*1.5, 0)
-			angle = 0;
-			step = 3;
-			// for (var i = 0; i < 360; i++) {
-			// 	rotate(step)
-			// 	line(0, 0, 1000, 20)
-			// 	angle += step;
-			// }
-		pop();
-		//
-		// img_1 = get(0, 0, width, height);
-		// img_1.loadPixels();
-		// for (let i = 0; i < width / 2; i++) {
-		// 	for (let j = 0; j < height / 2; j++) {
-		// 		img_1.set(i + height / 2, j, color(0, 0, 0, 0));
-		// 	}
-		// }
-		// img_1.updatePixels();
-}
-
-
-// var rotation = 0;
-// var angle = 0;
-// var background_color, rect_color, line_color;
-// var img_1;
-// var side_length = 250;
-
-// function setup() {
-// 	createCanvas(500, 500);
-
-// 	background_color = color(240, 64, 0);
-// 	rect_color = color(255, 70, 0);
-// 	line_color = color(255, 240, 230, 250);
-
-// 	angleMode(DEGREES);
-// 	imageMode(CENTER);
-// }
-
-
-// function draw() {
-
-// 	background(background_color);
-// 	fill(rect_color);
-// 	noStroke();
-// 	rect(0, 0, width, height);
-
-// 	stroke(line_color);
-// 	strokeWeight(1);
-
-// 	drawRays(mouseX, mouseY);
-// 	background(background_color);
-
-// 	fill(rect_color);
-// 	noStroke();
-// 	rect(10, 10, width - 20, height - 20);
-
-// 	translate(width / 2, height / 2);
-// 	rotate(180);
-// 	translate(0, side_length * 0.25);
-// 	image(img_1, 0, 0, side_length, side_length);
-// 	rotate(180);
-// 	image(img_1, 0, side_length / 2, side_length, side_length);
-// }
-
-// function drawRays(cx, cy) {
-
-// 	push()
-// 		translate(cx, cy);
-// 		scale(-1, 1);
-// 		rotate(rotation);
-// 		rotation -= 0.5;
-// 		rotation = rotation % 360;
-
-// 		angle = 0;
-// 		step = 3;
-// 		for (var i = 0; i < 360; i++) {
-// 			rotate(step)
-// 			line(0, 0, 1000, 0)
-// 			angle += step;
-// 		}
-// 	pop();
-
-// 	img_1 = get(0, 0, width, height);
-// 	img_1.loadPixels();
-// 	for (let i = 0; i < width / 2; i++) {
-// 		for (let j = 0; j < height / 2; j++) {
-// 			img_1.set(i + height / 2, j, color(0, 0, 0, 0));
-// 		}
-// 	}
-// 	img_1.updatePixels();
-// }
+function keyReleased() {
+  if (key === 'P') loop();
+};
