@@ -1,54 +1,72 @@
-/* body{
-  background: rgb(240, 64, 0);
+:root {
+  --COLOR-DARK: #232323;
+  --COLOR-RED: #EB0000;
+  --CURVE-SHOW: cubic-bezier(0.6, 0, 0, 1);
+  --SIZE-SECTION-HEIGHT: 80rem;
+  --SIZE-SECTION-WIDTH: 48rem;
+  --COLOR-BG: #E4E4E4;
 }
 
-.wrapper, html, body {
-    height: 100%;
-    margin: 0;
+body {
+  background-color: #000;
 }
+
 .wrapper {
-    display: flex;
-    flex-direction: column;
-		justify-content:center;
-    align-items: center;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-#row1 {
-    background-color: red;
-		width: 200px;
-}
-#row2 {
-    background-color: blue;
-}
-#row3 {
-    background-color: green;
-    display: flex;
-    width: 500px;
-    height: 200px;
-}
-#col1 {
-    background-color: yellow;
-    flex: 1;
-}
-#col2 {
-    background-color: orange;
-    flex: 1;
-}
-#col3 {
-    background-color: purple;
-    flex: 2;
+.logo-coloros {
+  transform: scale(0.4);
+  flex: 1;
+  /* fill: url(#header-shape-gradient) #fff; */
+  /* stroke: url(#header-shape-gradient) #fff; */
+  stroke: var(--COLOR-BG);
+  stroke-width: 2;
+  stroke-dasharray: 500px;
+  stroke-dashoffset: 1000px;
+  animation: loop var(--CURVE-SHOW) 3s infinite;
 }
 
-.title{
-    font-size: 30px;
-    font-family: "SF Pro Text","Helvetica Neue","Helvetica","Arial",sans-serif;
-    color: white;
-    font-weight: bold;
+#header-shape-gradient {
+  --color-stop: #f12c06;
+  --color-bot: #faed34;
+  animation: gradloop var(--CURVE-SHOW) 3s infinite;
+}
 
-    position: relative;
-    top: 450px;
-    left: -50px;
-} */
-#Artboard {
-  transform: rotateY(70deg);
+@keyframes loop {
+  0% {
+    stroke-dashoffset: 500px;
+  }
+
+  65% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: -500px;
+  }
+}
+
+@keyframes gradloop {
+  0% {
+    --color-stop: #000;
+    --color-bot: #FFF;
+  }
+
+  65% {
+    --color-stop: #FFF;
+    --color-bot: #000;
+  }
+
+  100% {
+    --color-stop: #000;
+    --color-bot: #FFF;
+  }
 }
