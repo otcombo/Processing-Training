@@ -1,0 +1,132 @@
+:root {
+  --COLOR-DARK: #232323;
+  --COLOR-BG: #F9F9F9;
+  --COLOR-GREEN: #00D9AE;
+  --COLOR-BLUE: #2080F6;
+  --COLOR-YELLOW: #FFDF00;
+  --COLOR-RED: #EA5F57;
+  --CURVE-SHOW: cubic-bezier(0.6, 0, 0, 1);
+  --SVG-STROKE-LENGTH: 370px;
+}
+
+body {
+  background-color: var(--COLOR-BG);
+  margin: 0;
+  padding: 0;
+}
+
+.svg-container {
+  width: 100vw;
+  position: absolute;
+  top: 25%;
+}
+
+.kv-stripe-green {
+  stroke: var(--COLOR-GREEN);
+  stroke-width: 500;
+  fill: none;
+  stroke-dasharray: 1200px;
+  stroke-dashoffset: 1200px;
+  animation: kf-stripe 1.3s var(--CURVE-SHOW) 0.2s;
+}
+
+.kv-stripe-blue {
+  stroke: var(--COLOR-BLUE);
+  stroke-width: 500;
+  fill: none;
+  stroke-dasharray: 1200px;
+  stroke-dashoffset: 1200px;
+  animation: kf-stripe 1s var(--CURVE-SHOW);
+}
+
+.wrapper {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-coloros {
+  flex: 1;
+  fill: none;
+  /* stroke: url(#header-shape-gradient) #fff; */
+  stroke-width: 20;
+  stroke-dasharray: var(--SVG-STROKE-LENGTH);
+  stroke-dashoffset: var(--SVG-STROKE-LENGTH);
+}
+
+.ani-stroke-1 {
+  stroke: var(--COLOR-DARK);
+  animation: kf-logo-7 2s var(--CURVE-SHOW) 1s forwards;
+}
+
+.ani-stroke-2 {
+  stroke: var(--COLOR-RED);
+  animation: kf-logo-7 1.95s var(--CURVE-SHOW) 1s forwards;
+}
+
+.ani-stroke-3 {
+  stroke: var(--COLOR-YELLOW);
+  animation: kf-logo-7 1.9s var(--CURVE-SHOW) 1s forwards;
+}
+
+.ani-stroke-4 {
+  stroke: var(--COLOR-BLUE);
+  animation: kf-logo-7 1.75s var(--CURVE-SHOW) 1s forwards;
+}
+
+.ani-stroke-5 {
+  stroke: var(--COLOR-GREEN);
+  animation: kf-logo-7 1.5s var(--CURVE-SHOW) 1s forwards;
+}
+
+@keyframes kf-logo-7 {
+  0% {
+    stroke-dashoffset: var(--SVG-STROKE-LENGTH);
+  }
+
+  100% {
+    stroke-dashoffset: calc(var(--SVG-STROKE-LENGTH)*0);
+  }
+}
+
+@keyframes kf-stripe {
+  0% {
+    stroke-dashoffset: -1200px;
+  }
+
+  70% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: 1200px;
+  }
+}
+
+#header-shape-gradient {
+  --color-stop: #f12c06;
+  --color-bot: #faed34;
+  animation: gradloop 3s var(--CURVE-SHOW) infinite;
+}
+
+@keyframes gradloop {
+  0% {
+    --color-stop: #000;
+    --color-bot: #FFF;
+  }
+
+  65% {
+    --color-stop: #FFF;
+    --color-bot: #000;
+  }
+
+  100% {
+    --color-stop: #000;
+    --color-bot: #FFF;
+  }
+}
