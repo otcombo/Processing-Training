@@ -1,7 +1,7 @@
 var dotArray = [];
 var effectRad = 0;
 
-// ============================================================ //
+// ============================================================
 
 Dot = (function() {
   class Dot {
@@ -11,6 +11,7 @@ Dot = (function() {
       this.color = color(255);
       this.targetPos = createVector(0, 0);
       this.currentMoveFrameCount = 0;
+      // this.moveDurationFrameCount = 10;
       this.isMoving = false;
       this.relayRatio = 0;
       this.relayPos = createVector(0, 0);
@@ -30,7 +31,9 @@ Dot = (function() {
       this.isMoving = true;
       displaceX = x - this.pos.x;
       displaceY = y - this.pos.y;
-      if (Math.random() < 0.5) {
+
+      //choose which direction to go first
+      if (Math.random() < 0.4) {
         this.relayRatio = abs(displaceX) / (abs(displaceX) + abs(displaceY));
         this.relayPos.set(this.pos.x + displaceX, this.pos.y);
       } else {
@@ -45,16 +48,20 @@ Dot = (function() {
         this.currentMoveFrameCount++;
         this.startRatio = this.getstartRatio();
         this.endRatio = this.getendRatio();
+
+        //set the head
         if (this.startRatio < this.relayRatio) {
           ratio = this.startRatio / this.relayRatio;
-          startX = this.pos.x + ratio * (this.relayPos.x - this.pos.x);
-          startY = this.pos.y + ratio * (this.relayPos.y - this.pos.y);
+          startX = this.pos.x + (this.relayPos.x - this.pos.x) * ratio;
+          startY = this.pos.y + (this.relayPos.y - this.pos.y) * ratio;
         } else {
           ratio = (this.startRatio - this.relayRatio) / (1 - this.relayRatio);
           startX = this.relayPos.x + ratio * (this.targetPos.x - this.relayPos.x);
           startY = this.relayPos.y + ratio * (this.targetPos.y - this.relayPos.y);
         }
         this.startPos.set(startX, startY);
+
+        //set the tail
         if (this.endRatio < this.relayRatio) {
           ratio = this.endRatio / this.relayRatio;
           endX = this.pos.x + ratio * (this.relayPos.x - this.pos.x);
@@ -65,6 +72,8 @@ Dot = (function() {
           endY = this.relayPos.y + ratio * (this.targetPos.y - this.relayPos.y);
         }
         this.endPos.set(endX, endY);
+
+        //stop when isArrived
         if (this.currentMoveFrameCount >= this.moveDurationFrameCount) {
           this.pos.set(this.targetPos.x, this.targetPos.y);
           this.isMoving = false;
@@ -77,11 +86,13 @@ Dot = (function() {
         strokeWeight(this.size);
         stroke(this.color);
         noFill();
+
         beginShape();
         vertex(this.startPos.x, this.startPos.y);
         if (this.startRatio < this.relayRatio && this.relayRatio < this.endRatio) {
           vertex(this.relayPos.x, this.relayPos.y);
         }
+
         vertex(this.endPos.x, this.endPos.y);
         endShape();
       } else {
@@ -109,7 +120,7 @@ Dot = (function() {
 
   }
 
-  Dot.prototype.moveDurationFrameCount = 40;
+  // Dot.prototype.moveDurationFrameCount = 80;
 
   return Dot;
 
@@ -136,19 +147,17 @@ function createColor(saturation, brightness) {
 };
 
 
-// ============================================================ //
+// ============================================================
 
 processDots = function(func, effectRad, probability) {
-  var eachDot, i, len;
-  for (i = 0, len = dotArray.length; i < len; i++) {
-    eachDot = dotArray[i];
-    if (eachDot.isMoving) {
+  for (let i = 0; i < dotArray.length; i++) {
+    if (dotArray[i].isMoving) {
       continue;
     }
     if (!(Math.random() < probability)) {
       continue;
     }
-    func(eachDot, effectRad);
+    func(dotArray[i], effectRad);
   }
 };
 
@@ -164,22 +173,25 @@ attractToMouse = function(dot, effectRad) {
   distance = Math.random() * effectRad;
   angle = Math.random() * TWO_PI;
   x = mouseX + distance * cos(angle);
+
   if (x < 0) {
     x = -x;
   } else if (x > width) {
     x = width - (x - width);
   }
+
   y = mouseY + distance * sin(angle);
   if (y < 0) {
     y = -y;
   } else if (y > height) {
     y = height - (y - height);
   }
+
   dot.setTarget(x, y);
 };
 
 
-// ============================================================ //
+// ============================================================
 
 function setup() {
   // min(windowWidth, displayWidth)
@@ -198,28 +210,31 @@ function setup() {
 };
 
 function draw() {
-  var eachDot, len;
-  blendMode(BLEND);
+  // blendMode(BLEND);
+  // gradient background
   for (let i = 0; i < height; i++) {
     let b = map(i, 0, height, 0, 20);
     stroke(220, 40, b);
     line(0, i, width, i);
   }
   // background(0, 0, 0);
-  blendMode(ADD);
-  for (let i = 0, len = dotArray.length; i < len; i++) {
-    eachDot = dotArray[i];
-    eachDot.update();
-    eachDot.display();
+  // blendMode(ADD);
+
+  for (let i = 0; i < dotArray.length; i++) {
+    dotArray[i].update();
+    dotArray[i].display();
   }
+
   if (mouseIsPressed) {
-    processDots(attractToMouse, effectRad, 0.1);
+    Dot.prototype.moveDurationFrameCount = 100;
+    processDots(attractToMouse, effectRad * 0.01, 0.1);
   } else {
+    Dot.prototype.moveDurationFrameCount = 20;
     processDots(awayFromMouse, effectRad, 1);
     processDots(attractToMouse, effectRad, 0.0003);
   }
 };
-//
+
 // function keyPressed() {
 //   if (key === 'P') noLoop();
 // };

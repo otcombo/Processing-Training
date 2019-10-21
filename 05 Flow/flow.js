@@ -38,7 +38,7 @@ class STAR {
 
     this.starX = map(this.x / this.z, 0, 1, 0, width);
     this.r = map(this.z, 0, width, 10, 2);
-    this.starY = this.y * (this.z / height); 
+    this.starY = this.y * (this.z / height);
     ellipse(this.starX, this.starY, this.r, this.r);
   }
 
@@ -51,7 +51,7 @@ let offset = 400;
 
 
 function setup() {
-  createCanvas(800, 800);
+  createCanvas(screen.width, screen.height);
   for (let i = 0; i < stars.length; i++) {
     stars[i] = new STAR();
   }
@@ -59,7 +59,7 @@ function setup() {
 
 function draw() {
   background(0);
-  translate(width+offset, height+offset);
+  translate(width + offset, height + offset);
 
 
   for (let i = 0; i < stars.length; i++) {
