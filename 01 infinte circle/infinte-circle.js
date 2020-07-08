@@ -8,7 +8,9 @@ function setup() {
 }
 
 function draw() {
-  r = random(windowWidth/2);
-  stroke(255,random(100));
-  circle(width/2,height/2,r);
+  background(0);
+  r = random(windowWidth / 2);
+  stroke(255, random(100));
+
+  circle(width / 2, height / 2, r);
 }

@@ -3,7 +3,7 @@ var effectRad = 0;
 
 // ============================================================
 
-Dot = (function() {
+Dot = (function () {
   class Dot {
     constructor() {
       this.pos = createVector(0, 0);
@@ -89,12 +89,14 @@ Dot = (function() {
 
         beginShape();
         vertex(this.startPos.x, this.startPos.y);
+
         if (this.startRatio < this.relayRatio && this.relayRatio < this.endRatio) {
           vertex(this.relayPos.x, this.relayPos.y);
         }
 
         vertex(this.endPos.x, this.endPos.y);
         endShape();
+
       } else {
         noStroke();
         fill(this.color);
@@ -120,7 +122,7 @@ Dot = (function() {
 
   }
 
-  // Dot.prototype.moveDurationFrameCount = 80;
+  // Dot.prototype.moveDurationFrameCount = 0;
 
   return Dot;
 
@@ -140,8 +142,8 @@ function createColor(saturation, brightness) {
   var newColor;
   colorMode(HSB);
   // newColor = color(random(360), saturation, brightness);
-  let colors = [186, 186, 186, 299];
-  newColor = color(random(colors), saturation, brightness);
+  let hue = [186, 186, 186, 299];
+  newColor = color(random(hue), saturation, brightness);
   colorMode(RGB);
   return newColor;
 };
@@ -149,7 +151,7 @@ function createColor(saturation, brightness) {
 
 // ============================================================
 
-processDots = function(func, effectRad, probability) {
+processDots = function (func, effectRad, probability) {
   for (let i = 0; i < dotArray.length; i++) {
     if (dotArray[i].isMoving) {
       continue;
@@ -161,14 +163,14 @@ processDots = function(func, effectRad, probability) {
   }
 };
 
-awayFromMouse = function(dot, effectRad) {
+awayFromMouse = function (dot, effectRad) {
   if (!(dot.getDistance(mouseX, mouseY) < effectRad)) {
     return;
   }
   dot.setTarget(random(width), random(height));
 };
 
-attractToMouse = function(dot, effectRad) {
+attractToMouse = function (dot, effectRad) {
   var angle, distance, x, y;
   distance = Math.random() * effectRad;
   angle = Math.random() * TWO_PI;
@@ -201,7 +203,7 @@ function setup() {
   var canvas = createCanvas(container.width, container.height);
   canvas.parent('section-game-bg');
 
-  for (var i = 0; i < 200; i++) {
+  for (var i = 0; i < 300; i++) {
     dotArray.push(createDot());
   }
   effectRad = 0.08 * width;
@@ -210,15 +212,15 @@ function setup() {
 };
 
 function draw() {
-  // blendMode(BLEND);
+  blendMode(BLEND);
   // gradient background
   for (let i = 0; i < height; i++) {
-    let b = map(i, 0, height, 0, 20);
-    stroke(220, 40, b);
+    let b = map(i, 0, height, 0, 13);
+    stroke(220, 37, b);
     line(0, i, width, i);
   }
   // background(0, 0, 0);
-  // blendMode(ADD);
+  blendMode(ADD);
 
   for (let i = 0; i < dotArray.length; i++) {
     dotArray[i].update();
@@ -226,19 +228,19 @@ function draw() {
   }
 
   if (mouseIsPressed) {
-    Dot.prototype.moveDurationFrameCount = 100;
+    Dot.prototype.moveDurationFrameCount = 200;
     processDots(attractToMouse, effectRad * 0.01, 0.1);
   } else {
-    Dot.prototype.moveDurationFrameCount = 20;
+    Dot.prototype.moveDurationFrameCount = 10;
     processDots(awayFromMouse, effectRad, 1);
     processDots(attractToMouse, effectRad, 0.0003);
   }
 };
 
-// function keyPressed() {
-//   if (key === 'P') noLoop();
-// };
-//
-// function keyReleased() {
-//   if (key === 'P') loop();
-// };
+function keyPressed() {
+  if (key === 'P') noLoop();
+};
+
+function keyReleased() {
+  if (key === 'P') loop();
+};
